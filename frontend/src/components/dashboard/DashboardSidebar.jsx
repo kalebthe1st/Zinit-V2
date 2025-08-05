@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import { assets } from '../../assets/assets';
 import { ShopContext } from '../../context/ShopContext';
@@ -29,7 +29,7 @@ const DashboardSidebar = () => {
           className='flex items-center gap-3 px-4 py-3 rounded border-l-4 border-transparent'
         >
           <img className='w-5 h-5' src={assets.order_icon} alt="Orders" />
-          <p>My Orders</p>
+          <p>{isSeller ? "Orders for My Products" : "My Orders"}</p>
         </NavLink>
          {isSeller && (
                     <>

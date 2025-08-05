@@ -1,5 +1,6 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
+import productModel from "../models/productModel.js";
 import Stripe from 'stripe'
 import razorpay from 'razorpay'
 
@@ -201,16 +202,66 @@ const allOrders = async (req,res) => {
 
 }
 
-// User Order Data For Forntend
+// User Order Data For Frontend
 const userOrders = async (req,res) => {
     try {
+        // userId is set by the auth middleware
         const { userId } = req.body
-        // CORRECT: Get userId from auth middleware. This is the critical security fix.
-        const orders = await orderModel.find({ userId})
-        res.json({success:true,orders})
+        
+        if (!userId) {
+            return res.json({success:false, message:"User ID not found"})
+        }
+        
+        const orders = await orderModel.find({ userId })
+        res.json({success:true, orders})
     } catch (error) {
         console.log(error)
-        res.json({success:false,message:"Error fetching orders"})
+        res.json({success:false, message:"Error fetching orders"})
+    }
+}
+
+// Fetch orders for products added by the seller
+const sellerOrders = async (req, res) => {
+    try {
+        // Get the seller ID from the middleware
+        const sellerId = req.userId;
+        
+        if (!sellerId) {
+            return res.status(401).json({ success: false, message: "Authentication error: User ID not found." });
+        }
+        
+        // First, get all products added by this seller
+        const sellerProducts = await productModel.find({ sellerId });
+        
+        if (sellerProducts.length === 0) {
+            return res.json({ success: true, orders: [] });
+        }
+        
+        // Get the product IDs
+        const productIds = sellerProducts.map(product => product._id.toString());
+        
+        // Find all orders that contain any of the seller's products
+        const orders = await orderModel.find({
+            "items.productId": { $in: productIds }
+        });
+        
+        // Filter each order to only include items from this seller
+        const filteredOrders = orders.map(order => {
+            // Create a copy of the order
+            const orderObj = order.toObject();
+            
+            // Filter the items to only include those from this seller
+            orderObj.items = orderObj.items.filter(item => 
+                productIds.includes(item.productId)
+            );
+            
+            return orderObj;
+        });
+        
+        res.json({ success: true, orders: filteredOrders });
+    } catch (error) {
+        console.log(error);
+        res.json({ success: false, message: "Error fetching seller orders" });
     }
 }
 
@@ -229,4 +280,4 @@ const updateStatus = async (req,res) => {
     }
 }
 
-export {verifyRazorpay, verifyStripe ,placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus}
+export {verifyRazorpay, verifyStripe ,placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, sellerOrders, updateStatus}

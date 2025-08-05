@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import  { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { ShopContext } from '../../context/ShopContext';
 import { toast } from 'react-toastify';
@@ -64,7 +64,7 @@ const MyProducts = () => {
             <h2 className="text-2xl font-bold mb-6">My Listed Products</h2>
             <div className="flex flex-col gap-4">
                 {myProducts.length === 0 ? (
-                    <p className="p-10 text-center bg-gray-50 rounded-md">You haven't listed any products yet. Click "Add Product" to get started!</p>
+                    <p className="p-10 text-center bg-gray-50 rounded-md">You havenot listed any products yet. Click Add Product to get started!</p>
                 ) : (
                     myProducts.map((product) => (
                         <div key={product._id} className="grid grid-cols-[auto_1fr_auto_auto] items-center border p-3 rounded-lg gap-4">
