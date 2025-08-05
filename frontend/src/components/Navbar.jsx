@@ -1,0 +1,162 @@
+import React, { useContext, useState } from "react";
+import { assets } from "../assets/assets";
+import { Link, NavLink } from "react-router-dom";
+import { ShopContext } from "../context/ShopContext";
+
+const Navbar = () => {
+  const [visible, setVisble] = useState(false);
+
+  const {
+    setShowSearch,
+    navigate,
+    getCartCount,
+    token, // <-- ADD THIS: To check if a user is logged in
+    setToken, // <-- ADD THIS: To log the user out
+    setCartItems, // <-- ADD THIS: To clear the cart on logout
+  } = useContext(ShopContext);
+  const logout = () => {
+    // Remove the token from browser storage
+    localStorage.removeItem("token");
+
+    // Reset the application state
+    setToken("");
+    setCartItems({});
+
+    // Redirect the user to the login page
+    navigate("/login");
+  };
+  return (
+    <div className="flex items-center justify-between py-5 font-medium">
+      <Link to="/">
+        <img className="w-36" src={assets.logo} alt="" />
+      </Link>
+
+      <ul className="hidden sm:flex gap-5 text-sm text-gray-700">
+        <NavLink to="/" className="flex flex-col items-center gap-1">
+          <p>HOME</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+        </NavLink>
+        <NavLink to="/collection" className="flex flex-col items-center gap-1">
+          <p>COLLECTION</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+        </NavLink>
+        <NavLink to="/about" className="flex flex-col items-center gap-1">
+          <p>ABOUT</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+        </NavLink>
+        <NavLink to="/contact" className="flex flex-col items-center gap-1">
+          <p>CONTACT</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+        </NavLink>
+      </ul>
+
+      <div className="flex items-center gap-6">
+        <img
+          onClick={() => {
+            setShowSearch(true);
+            navigate("/collection");
+          }}
+          className="w-5 cursor-pointer"
+          src={assets.search_icon}
+          alt=""
+        />
+        <div className="group relative">
+          {/* If there is no token, clicking the icon navigates to login */}
+          <img
+            onClick={() => !token && navigate("/login")}
+            className="w-5 cursor-pointer"
+            src={assets.profile_icon}
+            alt="Profile"
+          />
+
+          {/* --- Conditionally render the entire dropdown ONLY if a token exists --- */}
+          {token && (
+            <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4 z-10">
+              <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded shadow-lg">
+                {/* --- Make the links functional --- */}
+                <p
+                  onClick={() => navigate("/dashboard/profile")}
+                  className="cursor-pointer hover:text-black"
+                >
+                  My Profile
+                </p>
+                <p
+                  onClick={() => navigate("/orders")}
+                  className="cursor-pointer hover:text-black"
+                >
+                  My Orders
+                </p>
+                <hr />
+                <p onClick={logout} className="cursor-pointer hover:text-black">
+                  Logout
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+        <Link to="/cart" className="relative">
+          <img className="w-5 min-w-5" src={assets.cart_icon} alt="" />
+          <p
+            style={{ color: "#F7CD65", background: "#2b9fa5" }}
+            className="absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black aspect-square rounded-full text-[8px]"
+          >
+            {getCartCount()}
+          </p>
+        </Link>
+        <img
+          onClick={() => setVisble(true)}
+          className="w-5 cursor-pointer sm:hidden"
+          src={assets.menu_icon}
+          alt=""
+        />
+      </div>
+
+      {/* Sidebar Menu For Small Screens */}
+      <div
+        className={`absolute z-50 top-0 right-0 bottom-0 overflow-hidden bg-white transition-all ${
+          visible ? "w-full" : "w-0"
+        }`}
+      >
+        <div className="flex flex-col text-gray-600">
+          <div
+            onClick={() => setVisble(false)}
+            className="flex items-center gap-4 p-3 "
+          >
+            <img className="h-4 rotate-180" src={assets.dropdown_icon} alt="" />
+            <p>Back</p>
+          </div>
+          <NavLink
+            onClick={() => setVisble(false)}
+            to="/"
+            className="py-2 pl-6 border"
+          >
+            HOME
+          </NavLink>
+          <NavLink
+            onClick={() => setVisble(false)}
+            to="/collection"
+            className="py-2 pl-6 border"
+          >
+            COLLECTION
+          </NavLink>
+          <NavLink
+            onClick={() => setVisble(false)}
+            to="/about"
+            className="py-2 pl-6 border"
+          >
+            ABOUT
+          </NavLink>
+          <NavLink
+            onClick={() => setVisble(false)}
+            to="/contact"
+            className="py-2 pl-6 border"
+          >
+            CONTACT
+          </NavLink>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Navbar;
