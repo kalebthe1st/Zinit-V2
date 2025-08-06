@@ -79,12 +79,22 @@ import tradiotional from "./traditional.png";
 import ocassional from "./occasional.png";
 import bonda from "./Bonda.png";
 import modern from "./Modern.png";
+import upload_area from "./upload_area.png";
+import cbe from "./cbe.png";
+import telebirr from "./telebirr.png";
+import order_icon from "./order_icon.png";
+import add_icon from "./add_icon.png";
 
 export const assets = {
   logo,
   hero_img,
   cart_icon,
   bin_icon,
+  upload_area,
+  cbe,
+  telebirr,
+  add_icon,
+  order_icon,
   dropdown_icon,
   exchange_icon,
   profile_icon,

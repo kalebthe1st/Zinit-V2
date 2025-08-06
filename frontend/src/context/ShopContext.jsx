@@ -19,6 +19,7 @@ const ShopContextProvider = (props) => {
   // --- State for User Authentication & Authorization ---
   const [token, setToken] = useState("");
   const [isSeller, setIsSeller] = useState(false);
+  const [userProfile, setUserProfile] = useState(null); // <-- ADDED: Store the full user object
 
   // --- State for UI (like search) ---
   const [search, setSearch] = useState("");
@@ -80,12 +81,13 @@ const ShopContextProvider = (props) => {
   };
 
   // Fetches a user's profile to check their seller status
-  const checkUserStatus = async (userToken) => {
+  const fetchUserProfile = async (userToken) => {
     try {
       const response = await axios.get(`${backendUrl}/api/user/profile`, {
         headers: { token: userToken },
       });
       if (response.data.success) {
+        setUserProfile(response.data.user); // Store the full user object
         setIsSeller(response.data.user.isSeller);
       }
     } catch (error) {
@@ -177,7 +179,7 @@ const ShopContextProvider = (props) => {
 
         // 4. Fetch the user-specific data associated with that token.
         await getUserCart(userToken);
-        await checkUserStatus(userToken);
+        await fetchUserProfile(userToken);
       }
     }
 
@@ -227,6 +229,8 @@ const ShopContextProvider = (props) => {
     setRatingFilter,
     clearFilters,
     isSeller,
+    userProfile, // <-- EXPORT the user profile object
+    fetchUserProfile,
   };
 
   return (
