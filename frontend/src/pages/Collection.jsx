@@ -134,7 +134,7 @@ const Collection = () => {
               <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
                 <p className="flex gap-2"><input className="w-3" value="Topwear" onChange={toggleSubCategory} type="checkbox" checked={subCategory.includes("Topwear")} /> Topwear</p>
                 <p className="flex gap-2"><input className="w-3" value="Bottomwear" onChange={toggleSubCategory} type="checkbox" checked={subCategory.includes("Bottomwear")} /> Bottomwear</p>
-                <p className="flex gap-2"><input className="w-3" value="Winterwear" onChange={toggleSubCategory} type="checkbox" checked={subCategory.includes("Winterwear")} /> Winterwear</p>
+                <p className="flex gap-2"><input className="w-3" value="Complete" onChange={toggleSubCategory} type="checkbox" checked={subCategory.includes("Complete")} /> Complete</p>
                 <p className="flex gap-2"><input className="w-3" value="Sneakers" onChange={toggleSubCategory} type="checkbox" checked={subCategory.includes("Sneakers")} /> Sneakers</p>
                 <p className="flex gap-2"><input className="w-3" value="Boots" onChange={toggleSubCategory} type="checkbox" checked={subCategory.includes("Boots")} /> Boots</p>
               </div>
@@ -150,7 +150,7 @@ const Collection = () => {
               <option value="high-low">Sort by: High to Low</option>
             </select>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
+          <div className="masonry-grid">
             {filterProducts.length > 0 ? (
                 filterProducts.map((item) => (
                     <ProductItem key={item._id} product={item} />

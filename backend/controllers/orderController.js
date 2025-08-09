@@ -106,12 +106,10 @@ const placeOrderStripe = async (req, res) => {
     res.json({ success: true, session_url: session.url });
   } catch (error) {
     console.error("Error in placeOrderStripe:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error while processing Stripe payment.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Server error while processing Stripe payment.",
+    });
   }
 };
 
@@ -150,23 +148,19 @@ const placeOrderRazorpay = async (req, res) => {
     razorpayInstance.orders.create(options, (error, order) => {
       if (error) {
         console.error("Razorpay order creation error:", error);
-        return res
-          .status(500)
-          .json({
-            success: false,
-            message: "Failed to create Razorpay order.",
-          });
+        return res.status(500).json({
+          success: false,
+          message: "Failed to create Razorpay order.",
+        });
       }
       res.json({ success: true, order });
     });
   } catch (error) {
     console.error("Error in placeOrderRazorpay:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error while processing Razorpay payment.",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Server error while processing Razorpay payment.",
+    });
   }
 };
 
@@ -294,11 +288,40 @@ const sellerOrders = async (req, res) => {
 const updateStatus = async (req, res) => {
   try {
     const { orderId, status } = req.body;
-    await orderModel.findByIdAndUpdate(orderId, { status });
+    const order = await orderModel.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found." });
+    }
+
+    // --- NEW LOGIC: Generate review tokens when order is delivered ---
+    if (status === "Delivered") {
+      await Promise.all(
+        order.items.map(async (item) => {
+          // Only generate a token if one doesn't already exist
+          if (!item.reviewToken) {
+            const reviewToken = crypto.randomBytes(20).toString("hex");
+            await orderModel.updateOne(
+              { _id: orderId, "items._id": item._id },
+              { $set: { "items.$.reviewToken": reviewToken } }
+            );
+          }
+        })
+      );
+    }
+
     res.json({ success: true, message: "Status Updated" });
   } catch (error) {
     console.error("Error in updateStatus:", error);
-    res.status(500).json({ success: false, message: "Error updating status." });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error updating status." });
   }
 };
 

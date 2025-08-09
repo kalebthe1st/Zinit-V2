@@ -7,7 +7,7 @@ export const ShopContext = createContext(null);
 
 const ShopContextProvider = (props) => {
   // --- Part 1: Core State and API Configuration ---
-  const currency = "$"; // Or 'birr' as you had in Zinit
+  const currency = "birr"; // Or 'birr' as you had in Zinit
   const delivery_fee = 10;
   const backendUrl = import.meta.env.VITE_BACKEND_URL; // CRITICAL: You must have a .env file with this
   const navigate = useNavigate();

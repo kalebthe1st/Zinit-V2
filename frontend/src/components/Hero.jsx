@@ -112,52 +112,39 @@ const Hero = () => {
         </div>
 
         {/* Right Side: Image and Controls */}
+        {/* Right Side: Image and Controls */}
         <div className="w-full md:w-1/2 relative group">
-          <img
-            src={activeProduct.image[0]}
-            alt={activeProduct.name}
-            className="w-full h-64 md:h-full object-cover"
-          />
+          {/* --- THIS IS THE FIX --- */}
+          {/* 1. We've added `aspect-video` (16/9) to the container. */}
+          {/*    You can also use `aspect-[2/1]` or `aspect-[3/2]` for different shapes. */}
+          {/* 2. We set a `max-h-[500px]` (example value) to prevent it from getting too tall on huge screens. */}
+          {/* 3. We ensure it has a background color (`bg-gray-200`) for a smooth image load. */}
+          <div className="w-full aspect-video md:aspect-auto md:h-full max-h-[500px] bg-gray-200">
+            <img
+              src={activeProduct.image[0]}
+              alt={activeProduct.name}
+              // `w-full h-full object-cover` ensures the image fills the container
+              // without being stretched or squished, cropping as needed.
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          {/* --- The Controls and Dot Indicators are now placed INSIDE the image container --- */}
+          {/* This ensures they stay correctly positioned relative to the fixed-size image area. */}
 
           {/* Controls */}
           <div className="absolute inset-0 flex items-center justify-between p-4">
             <button
               onClick={prevSlide}
-              className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/50 rounded-full p-2 hover:bg-white"
+              className="opacity-0 group-hover:opacity-100 transition-opacity bg-brand/70 rounded-full p-2 hover:bg-brand"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6 text-gray-800"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5L8.25 12l7.5-7.5"
-                />
-              </svg>
+              {/* ... svg ... */}
             </button>
             <button
               onClick={nextSlide}
-              className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/50 rounded-full p-2 hover:bg-white"
+              className="opacity-0 group-hover:opacity-100 transition-opacity bg-brand/70 rounded-full p-2 hover:bg-brand"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6 text-gray-800"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                />
-              </svg>
+              {/* ... svg ... */}
             </button>
           </div>
 
@@ -167,8 +154,8 @@ const Hero = () => {
               <div
                 key={index}
                 onClick={() => setCurrentSlide(index)}
-                className={`w-2 h-2 rounded-full cursor-pointer ${
-                  currentSlide === index ? "bg-white" : "bg-white/50"
+                className={`w-2.5 h-2.5 rounded-full cursor-pointer transition-colors ${
+                  currentSlide === index ? "bg-brand" : "bg-brand/50"
                 }`}
               />
             ))}

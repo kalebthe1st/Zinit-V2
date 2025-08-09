@@ -1,25 +1,35 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
+import userModel from "../models/userModel.js"; // <-- Import userModel
 
 const authUser = async (req, res, next) => {
+  const { token } = req.headers;
+  if (!token) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Not Authorized. Please Login Again." });
+  }
+  try {
+    const token_decode = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await userModel.findById(token_decode.id).select("name");
 
-    const { token } = req.headers;
-
-    if (!token) {
-        return res.json({ success: false, message: 'Not Authorized Login Again' })
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
     }
 
-    try {
+    req.userId = token_decode.id;
+    req.userName = user.name; // <-- ADD THIS
 
-        const token_decode = jwt.verify(token, process.env.JWT_SECRET)
-        req.body.userId = token_decode.id
-        req.userId = token_decode.id;
-        next()
+    next();
+  } catch (error) {
+    res
+      .status(401)
+      .json({
+        success: false,
+        message: "Authentication failed. Token is invalid.",
+      });
+  }
+};
 
-    } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
-    }
-
-}
-
-export default authUser
+export default authUser;

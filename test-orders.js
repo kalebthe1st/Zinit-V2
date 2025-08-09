@@ -15,7 +15,7 @@ async function testMyOrders() {
   console.log('Testing my-orders endpoint...');
   
   try {
-    const response = await axios.post(`${backendUrl}/api/order/my-orders`, 
+    const response = await axios.post(`${backendUrl}/api/order/user-orders`, 
       { userId: null }, // The userId should be extracted from token by middleware
       { headers: { token } }
     );

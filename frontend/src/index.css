@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Prata&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -23,9 +23,42 @@ a.active hr {
   display: none;
 }
 
-@media (max-width:640px) {
+@media (max-width: 640px) {
   a.active {
     background-color: black;
     color: white;
   }
+}
+.masonry-grid {
+  /* Defines the number of columns for different screen sizes */
+  column-count: 2; /* 2 columns on small screens */
+  column-gap: 1rem; /* Adjust the gap between columns */
+}
+
+/* 2. Responsive column counts */
+@media (min-width: 640px) {
+  /* sm breakpoint */
+  .masonry-grid {
+    column-count: 3;
+  }
+}
+@media (min-width: 1024px) {
+  /* lg breakpoint */
+  .masonry-grid {
+    column-count: 4;
+  }
+}
+@media (min-width: 1280px) {
+  /* xl breakpoint */
+  .masonry-grid {
+    column-count: 5;
+  }
+}
+
+/* 3. The individual items within the grid */
+.masonry-item {
+  /* This is the magic property. It prevents an item from breaking across columns. */
+  break-inside: avoid-column;
+  margin-bottom: 1rem; /* Vertical gap between items in the same column */
+  width: 100%;
 }

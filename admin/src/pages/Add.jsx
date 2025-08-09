@@ -174,8 +174,8 @@ const Add = ({ token }) => {
             className="px-3 py-2 border"
           >
             <option value="Clothing">Clothing</option>
-            <option value="Accessories">Accessories</option>
-            <option value="Footwear">Footwear</option>
+            
+            <option value="footwear">Footwear</option>
           </select>
         </div>
         <div>
@@ -224,7 +224,9 @@ const Add = ({ token }) => {
           >
             <option value="Topwear">Topwear</option>
             <option value="Bottomwear">Bottomwear</option>
-            <option value="Winterwear">Winterwear</option>
+            <option value="Complete">Complete</option>
+            <option value="Dress">Dress</option>
+            <option value="Family">Family</option>
           </select>
         </div>
         <div>
@@ -234,7 +236,7 @@ const Add = ({ token }) => {
             value={price}
             className="w-[120px] px-3 py-2 border"
             type="Number"
-            placeholder="$25"
+            placeholder="1000 birr"
             required
           />
         </div>

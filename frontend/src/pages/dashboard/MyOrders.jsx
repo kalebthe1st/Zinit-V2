@@ -1,12 +1,9 @@
-import { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { ShopContext } from "../../context/ShopContext";
 import { toast } from "react-toastify";
 
 const MyOrders = () => {
-  // This component now assumes the user is a seller.
-  // We still get isSeller to ensure the correct API is called,
-  // but the rendering logic will be seller-specific.
   const { token, backendUrl, currency, isSeller } = useContext(ShopContext);
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,45 +12,34 @@ const MyOrders = () => {
     const fetchOrders = async () => {
       if (!token) return;
       setIsLoading(true);
-
       try {
-        // The endpoint is chosen based on the user's role.
         const endpoint = isSeller
           ? `${backendUrl}/api/order/seller-orders`
           : `${backendUrl}/api/order/user-orders`;
-
         const response = await axios.get(endpoint, { headers: { token } });
-
         if (response.data.success) {
           setOrders(
             response.data.orders.sort(
               (a, b) => new Date(b.date) - new Date(a.date)
             )
           );
-        } else {
-          toast.error(response.data.message);
         }
       } catch (error) {
         toast.error("Failed to fetch orders.");
-        console.error("Fetch Orders Error:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchOrders();
-  }, [token, isSeller, backendUrl]);
+  }, [token, isSeller]);
 
-  if (isLoading) {
-    return <p className="p-10 text-center">Loading orders...</p>;
-  }
+  if (isLoading) return <p className="p-10 text-center">Loading orders...</p>;
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">
         {isSeller ? "Orders for Your Products" : "My Purchase History"}
       </h2>
-
       <div className="flex flex-col gap-6">
         {orders.length === 0 ? (
           <p className="p-10 text-center bg-gray-50 rounded-md">
@@ -64,9 +50,10 @@ const MyOrders = () => {
         ) : (
           orders.map((order) => (
             <div
-              className="border p-4 rounded-lg shadow-sm bg-white"
               key={order._id}
+              className="border p-4 rounded-lg shadow-sm bg-white"
             >
+              {/* ... (Detailed rendering logic for both seller and buyer views) ... */}
               {/* Header Section: Contains General Order Info */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600 mb-3 pb-3 border-b">
                 <div>
@@ -143,5 +130,5 @@ const MyOrders = () => {
     </div>
   );
 };
-
 export default MyOrders;
+

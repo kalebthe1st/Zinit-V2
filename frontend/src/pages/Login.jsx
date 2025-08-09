@@ -6,13 +6,15 @@ import { toast } from "react-toastify";
 const Login = () => {
   const { setToken, backendUrl } = useContext(ShopContext);
   const [currentState, setCurrentState] = useState("Login");
-
   const [data, setData] = useState({
     name: "",
     email: "",
     password: "",
-    telebirrPhone: "", // <-- ADDED
+    telebirrPhone: "",
   });
+
+  // --- NEW STATE for showing verification message ---
+  const [showVerificationMsg, setShowVerificationMsg] = useState(false);
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -21,6 +23,8 @@ const Login = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    setShowVerificationMsg(false); // Reset message on new submission
+
     const url =
       currentState === "Login"
         ? `${backendUrl}/api/user/login`
@@ -28,10 +32,18 @@ const Login = () => {
 
     try {
       const response = await axios.post(url, data);
+
       if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
-        setToken(response.data.token);
-        window.location.replace("/");
+        if (currentState === "Sign Up") {
+          // On successful registration, show the verification message
+          setShowVerificationMsg(true);
+          toast.success(response.data.message);
+        } else {
+          // On successful login, set the token and redirect
+          localStorage.setItem("token", response.data.token);
+          setToken(response.data.token);
+          window.location.replace("/");
+        }
       } else {
         toast.error(response.data.message);
       }
@@ -39,6 +51,25 @@ const Login = () => {
       toast.error(error.response?.data?.message || "An error occurred.");
     }
   };
+
+  // If verification message is shown, render it instead of the form
+  if (showVerificationMsg) {
+    return (
+      <div className="text-center m-auto mt-20 p-10 bg-green-50 rounded-lg max-w-lg">
+        <h2 className="text-2xl font-bold text-green-800">
+          Registration Successful!
+        </h2>
+        <p className="mt-4 text-gray-700">
+          A verification link has been sent to your email address:
+        </p>
+        <p className="font-semibold my-2">{data.email}</p>
+        <p className="text-gray-700">
+          Please check your inbox (and your spam folder) to complete your
+          registration.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form

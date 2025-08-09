@@ -4,39 +4,23 @@ import { ShopContext } from "../../context/ShopContext";
 import { toast } from "react-toastify";
 
 const Profile = () => {
-  const { token, backendUrl } = useContext(ShopContext);
-  const [user, setUser] = useState(null);
+  const { token, backendUrl, userProfile, fetchUserProfile } =
+    useContext(ShopContext);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     telebirrPhone: "",
     cbeAccount: "",
   });
 
-  // Fetch profile data when the component loads
-  const fetchUserProfile = async () => {
-    if (!token) return;
-    try {
-      const response = await axios.get(`${backendUrl}/api/user/profile`, {
-        headers: { token },
-      });
-      if (response.data.success) {
-        setUser(response.data.user);
-        // Pre-fill the form with existing data
-        setFormData({
-          telebirrPhone: response.data.user.telebirrPhone || "",
-          cbeAccount: response.data.user.cbeAccount || "",
-        });
-      } else {
-        toast.error("Could not fetch profile.");
-      }
-    } catch (error) {
-      toast.error("Error fetching your profile.");
-    }
-  };
-
   useEffect(() => {
-    fetchUserProfile();
-  }, [token]);
+    // Pre-fill form when userProfile data is loaded from context
+    if (userProfile) {
+      setFormData({
+        telebirrPhone: userProfile.telebirrPhone || "",
+        cbeAccount: userProfile.cbeAccount || "",
+      });
+    }
+  }, [userProfile]);
 
   const onChangeHandler = (event) => {
     const { name, value } = event.target;
@@ -49,13 +33,11 @@ const Profile = () => {
       const response = await axios.put(
         `${backendUrl}/api/user/profile`,
         formData,
-        {
-          headers: { token },
-        }
+        { headers: { token } }
       );
       if (response.data.success) {
-        setUser(response.data.user); // Update the displayed user data
-        setEditMode(false); // Exit edit mode
+        await fetchUserProfile(token); // Refresh the global user profile data
+        setEditMode(false);
         toast.success("Profile updated successfully!");
       } else {
         toast.error(response.data.message);
@@ -65,7 +47,8 @@ const Profile = () => {
     }
   };
 
-  if (!user) return <p className="text-center p-10">Loading...</p>;
+  if (!userProfile)
+    return <p className="text-center p-10">Loading profile data...</p>;
 
   return (
     <div>
@@ -82,10 +65,9 @@ const Profile = () => {
       </div>
 
       {editMode ? (
-        // --- EDIT MODE FORM ---
         <form
           onSubmit={handleUpdateProfile}
-          className="bg-white p-6 rounded-lg shadow-sm border space-y-4"
+          className="bg-white p-6 rounded-lg shadow-sm border space-y-4 max-w-lg"
         >
           <div>
             <label
@@ -121,7 +103,7 @@ const Profile = () => {
               placeholder="e.g., 1000..."
             />
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-4 pt-2">
             <button
               type="submit"
               className="bg-black text-white px-4 py-2 text-sm rounded-md hover:bg-gray-800"
@@ -138,26 +120,25 @@ const Profile = () => {
           </div>
         </form>
       ) : (
-        // --- DISPLAY MODE ---
-        <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
+        <div className="bg-white p-6 rounded-lg shadow-sm border space-y-4 max-w-lg">
           <div className="mb-4">
             <p className="text-sm text-gray-500">Full Name</p>
-            <p className="text-lg font-medium">{user.name}</p>
+            <p className="text-lg font-medium">{userProfile.name}</p>
           </div>
           <div className="mb-4">
             <p className="text-sm text-gray-500">Email Address</p>
-            <p className="text-lg font-medium">{user.email}</p>
+            <p className="text-lg font-medium">{userProfile.email}</p>
           </div>
           <div className="mb-4">
             <p className="text-sm text-gray-500">Telebirr Phone</p>
             <p className="text-lg font-medium">
-              {user.telebirrPhone || "Not provided"}
+              {userProfile.telebirrPhone || "Not provided"}
             </p>
           </div>
           <div>
             <p className="text-sm text-gray-500">CBE Account Number</p>
             <p className="text-lg font-medium">
-              {user.cbeAccount || "Not provided"}
+              {userProfile.cbeAccount || "Not provided"}
             </p>
           </div>
         </div>
